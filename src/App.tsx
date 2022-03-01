@@ -1,7 +1,12 @@
 import { CustomRoutes } from "src/routes";
+import { SnackbarProvider } from "notistack";
 
 const App = () => {
-  return <CustomRoutes />;
+  return (
+    <SnackbarProvider maxSnack={3}>
+      <CustomRoutes />
+    </SnackbarProvider>
+  );
 };
 
 export default App;

@@ -29,6 +29,7 @@ import {
 } from "firebase/auth";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { FormTypes } from "src/constants/FormTypes";
+import { useSnackbar } from "notistack";
 
 const borderRadius = 6;
 
@@ -38,9 +39,8 @@ export const HomePage = () => {
   const { isLoggedIn } = account;
   const dispatcher = useDispatch();
   const [formType, setFormType] = useState<"login" | "register">("login");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const loginForm = useForm({
     initialValues: {
@@ -108,7 +108,9 @@ export const HomePage = () => {
 
         if (!user.emailVerified) {
           signOut(auth);
-          alert("Please verify your email.");
+          enqueueSnackbar("Please verify your email.", {
+            variant: "warning",
+          });
           setLoading(false);
           return;
         }
@@ -125,9 +127,10 @@ export const HomePage = () => {
         return;
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log("An error occured: ", errorCode, errorMessage);
+        enqueueSnackbar(error.message, {
+          variant: "error",
+        });
+
         setLoading(false);
       });
   };
@@ -152,27 +155,30 @@ export const HomePage = () => {
         });
 
         sendEmailVerification(user);
-        alert("Account is created. Please verify your email to login.");
+        enqueueSnackbar(
+          "Account is created. Please verify your email to login.",
+          {
+            variant: "success",
+          }
+        );
         registerForm.reset();
         setLoading(false);
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log("Error ocured: ", errorCode, errorMessage);
+        enqueueSnackbar(error.message, {
+          variant: "error",
+        });
         setLoading(false);
       });
   };
 
   const switchToRegisterView = () => {
     setFormType("register");
-    setError("");
     loginForm.reset();
   };
 
   const switchToLoginView = () => {
     setFormType("login");
-    setError("");
     registerForm.reset();
   };
 
@@ -180,157 +186,161 @@ export const HomePage = () => {
     return <Navigate to="/dashboard" />;
   }
   return (
-    <div className={classes.wrapper}>
-      <div className={classes.gridWrapper}>
-        <SimpleGrid
-          cols={2}
-          spacing={0}
-          className={classes.maxWidthHeight}
-          breakpoints={[{ maxWidth: 1200, cols: 1 }]}
-        >
-          <div className={classes.form}>
-            <form
-              onSubmit={
-                formType === "login"
-                  ? loginForm.onSubmit(handleLogin)
-                  : registerForm.onSubmit(handleRegister)
-              }
-              className={classes.loginForm}
-            >
-              {formType === "login" && (
-                <>
-                  <TextInput
-                    label="Email"
-                    name="email"
-                    data-autofocus
-                    required
-                    type="email"
-                    icon={<MailOutlineIcon />}
-                    onBlur={() => loginForm.validateField("email")}
-                    {...loginForm.getInputProps("email")}
-                  />
+    <>
+      <div className={classes.wrapper}>
+        <div className={classes.gridWrapper}>
+          <SimpleGrid
+            cols={2}
+            spacing={0}
+            className={classes.maxWidthHeight}
+            breakpoints={[{ maxWidth: 1200, cols: 1 }]}
+          >
+            <div className={classes.form}>
+              <form
+                onSubmit={
+                  formType === "login"
+                    ? loginForm.onSubmit(handleLogin)
+                    : registerForm.onSubmit(handleRegister)
+                }
+                className={classes.loginForm}
+              >
+                {formType === "login" && (
+                  <>
+                    <TextInput
+                      label="Email"
+                      name="email"
+                      data-autofocus
+                      required
+                      type="email"
+                      icon={<MailOutlineIcon />}
+                      onBlur={() => loginForm.validateField("email")}
+                      {...loginForm.getInputProps("email")}
+                    />
 
-                  <PasswordInput
-                    label="Password"
-                    name="password"
-                    required
-                    icon={<LockOutlinedIcon />}
-                    onBlur={() => loginForm.validateField("password")}
-                    {...loginForm.getInputProps("password")}
-                  />
+                    <PasswordInput
+                      label="Password"
+                      name="password"
+                      required
+                      icon={<LockOutlinedIcon />}
+                      onBlur={() => loginForm.validateField("password")}
+                      {...loginForm.getInputProps("password")}
+                    />
 
-                  <div className={classes.forgotPassword}>
-                    <Checkbox label="Remember me" />
-                    <Text size="sm" color="blue" className={classes.pointer}>
-                      Forgot password?
-                    </Text>
-                  </div>
+                    <div className={classes.forgotPassword}>
+                      <Checkbox label="Remember me" />
+                      <Text size="sm" color="blue" className={classes.pointer}>
+                        Forgot password?
+                      </Text>
+                    </div>
 
-                  <Button fullWidth type="submit">
-                    {loading ? <Loader size="sm" color="lime" /> : "Login"}
-                  </Button>
+                    <Button fullWidth type="submit">
+                      {loading ? <Loader size="sm" color="lime" /> : "Login"}
+                    </Button>
 
-                  <span className={classes.notRegistered}>
-                    <Text size="sm" color="grey">
-                      Not registered yet?
-                    </Text>
+                    <span className={classes.notRegistered}>
+                      <Text size="sm" color="grey">
+                        Not registered yet?
+                      </Text>
 
-                    <Text
-                      size="sm"
-                      color="blue"
-                      className={classes.pointer}
-                      onClick={switchToRegisterView}
-                    >
-                      Create an account
-                    </Text>
-                  </span>
-                </>
-              )}
+                      <Text
+                        size="sm"
+                        color="blue"
+                        className={classes.pointer}
+                        onClick={switchToRegisterView}
+                      >
+                        Create an account
+                      </Text>
+                    </span>
+                  </>
+                )}
 
-              {formType === "register" && (
-                <>
-                  <TextInput
-                    label="Name"
-                    name="name"
-                    required
-                    type="text"
-                    data-autofocus
-                    icon={<CreateOutlinedIcon />}
-                    onBlur={() => registerForm.validateField("name")}
-                    {...registerForm.getInputProps("name")}
-                  />
+                {formType === "register" && (
+                  <>
+                    <TextInput
+                      label="Name"
+                      name="name"
+                      required
+                      type="text"
+                      data-autofocus
+                      icon={<CreateOutlinedIcon />}
+                      onBlur={() => registerForm.validateField("name")}
+                      {...registerForm.getInputProps("name")}
+                    />
 
-                  <TextInput
-                    label="Surname"
-                    name="surname"
-                    required
-                    type="text"
-                    icon={<CreateOutlinedIcon />}
-                    onBlur={() => registerForm.validateField("surname")}
-                    {...registerForm.getInputProps("surname")}
-                  />
+                    <TextInput
+                      label="Surname"
+                      name="surname"
+                      required
+                      type="text"
+                      icon={<CreateOutlinedIcon />}
+                      onBlur={() => registerForm.validateField("surname")}
+                      {...registerForm.getInputProps("surname")}
+                    />
 
-                  <TextInput
-                    label="Email"
-                    name="email"
-                    required
-                    type="email"
-                    icon={<MailOutlineIcon />}
-                    onBlur={() => registerForm.validateField("email")}
-                    {...registerForm.getInputProps("email")}
-                  />
+                    <TextInput
+                      label="Email"
+                      name="email"
+                      required
+                      type="email"
+                      icon={<MailOutlineIcon />}
+                      onBlur={() => registerForm.validateField("email")}
+                      {...registerForm.getInputProps("email")}
+                    />
 
-                  <PasswordInput
-                    label="Password"
-                    name="password"
-                    required
-                    icon={<LockOutlinedIcon />}
-                    onBlur={() => registerForm.validateField("password")}
-                    {...registerForm.getInputProps("password")}
-                  />
+                    <PasswordInput
+                      label="Password"
+                      name="password"
+                      required
+                      icon={<LockOutlinedIcon />}
+                      onBlur={() => registerForm.validateField("password")}
+                      {...registerForm.getInputProps("password")}
+                    />
 
-                  <PasswordInput
-                    label="Confirm Password"
-                    name="confirmpassword"
-                    required
-                    icon={<LockOutlinedIcon />}
-                    onBlur={() => registerForm.validateField("confirmPassword")}
-                    {...registerForm.getInputProps("confirmPassword")}
-                  />
+                    <PasswordInput
+                      label="Confirm Password"
+                      name="confirmpassword"
+                      required
+                      icon={<LockOutlinedIcon />}
+                      onBlur={() =>
+                        registerForm.validateField("confirmPassword")
+                      }
+                      {...registerForm.getInputProps("confirmPassword")}
+                    />
 
-                  <Button fullWidth type="submit">
-                    {loading ? <Loader size="sm" color="lime" /> : "Register"}
-                  </Button>
+                    <Button fullWidth type="submit">
+                      {loading ? <Loader size="sm" color="lime" /> : "Register"}
+                    </Button>
 
-                  <span style={{ display: "flex", columnGap: 5 }}>
-                    <Text size="sm" color="grey">
-                      Already have an account?
-                    </Text>
+                    <span style={{ display: "flex", columnGap: 5 }}>
+                      <Text size="sm" color="grey">
+                        Already have an account?
+                      </Text>
 
-                    <Text
-                      size="sm"
-                      color="blue"
-                      className={classes.pointer}
-                      onClick={switchToLoginView}
-                    >
-                      Login
-                    </Text>
-                  </span>
-                </>
-              )}
-            </form>
-          </div>
-          <div className={classes.rightSide}>
-            <Image src={Logo} alt="People" sx={{ width: "80%" }} />
-            <span className={classes.title}>Event Board</span>
+                      <Text
+                        size="sm"
+                        color="blue"
+                        className={classes.pointer}
+                        onClick={switchToLoginView}
+                      >
+                        Login
+                      </Text>
+                    </span>
+                  </>
+                )}
+              </form>
+            </div>
+            <div className={classes.rightSide}>
+              <Image src={Logo} alt="People" sx={{ width: "80%" }} />
+              <span className={classes.title}>Event Board</span>
 
-            <span className={classes.description}>
-              Share events, find events, have fun.
-            </span>
-          </div>
-        </SimpleGrid>
+              <span className={classes.description}>
+                Share events, find events, have fun.
+              </span>
+            </div>
+          </SimpleGrid>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
