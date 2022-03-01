@@ -360,6 +360,11 @@ const useStyles = createStyles((theme) => ({
     [`@media (min-width: 1200px)`]: {
       height: "70%",
     },
+
+    [`@media (max-width: 900px)`]: {
+      width: "90%",
+      padding: "2rem 0",
+    },
   },
   maxWidthHeight: {
     height: "100%",
