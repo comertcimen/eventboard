@@ -1,6 +1,6 @@
 import { Center } from "@mantine/core";
 
-export const Dashboard = () => {
+export const Calendar = () => {
   return (
     <Center
       sx={{
@@ -8,7 +8,7 @@ export const Dashboard = () => {
         gap: 10,
       }}
     >
-      <div>Dashboard Page</div>
+      <div>Calendar Page</div>
     </Center>
   );
 };

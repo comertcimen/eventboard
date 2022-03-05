@@ -18,7 +18,7 @@ import { useState } from "react";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
-import { ACCOUNT_INITIALIZE } from "src/store/actions";
+import { LOGIN } from "src/store/actions";
 import { auth, db } from "src/utils";
 import {
   createUserWithEmailAndPassword,
@@ -35,12 +35,12 @@ const borderRadius = 6;
 
 export const HomePage = () => {
   const { classes } = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
   const account = useSelector((state: State) => state.account);
   const { isLoggedIn } = account;
   const dispatcher = useDispatch();
   const [formType, setFormType] = useState<"login" | "register">("login");
   const [loading, setLoading] = useState<boolean>(false);
-  const { enqueueSnackbar } = useSnackbar();
 
   const loginForm = useForm({
     initialValues: {
@@ -52,16 +52,12 @@ export const HomePage = () => {
       email: (value) =>
         new RegExp("^\\w+([-+.']w+)*@uos.de$").test(value) ||
         new RegExp("^\\w+([-+.']w+)*@uni-osnabrueck.de$").test(value),
-      password: (value) =>
-        /^(?!.*\s)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]).{8,16}$/.test(
-          value
-        ),
+      password: (value) => value !== "",
     },
 
     errorMessages: {
       email: "Email must be a valid uni email",
-      password:
-        "Password should contain 1 number, 1 letter and at least 6 characters",
+      password: "Password must be filled",
     },
   });
 
@@ -91,7 +87,7 @@ export const HomePage = () => {
     errorMessages: {
       email: "Email must be a valid uni email",
       password:
-        "Password should contain 1 number, 1 letter and at least 6 characters",
+        "Enter a combination of at least six letters(uppercase and lowercase), numbers, and special characters !@#$%^&*()--+={}",
       confirmPassword: "Passwords don't match. Try again",
       name: "Name must be longer than 1 character",
       surname: "Surname must be longer than 1 character",
@@ -116,7 +112,7 @@ export const HomePage = () => {
         }
 
         await dispatcher({
-          type: ACCOUNT_INITIALIZE,
+          type: LOGIN,
           payload: {
             isLoggedIn: true,
             user: user.email,
@@ -227,7 +223,17 @@ export const HomePage = () => {
                     />
 
                     <div className={classes.forgotPassword}>
-                      <Checkbox label="Remember me" />
+                      <Checkbox
+                        label="Remember me"
+                        onClick={() => {
+                          enqueueSnackbar(
+                            "This feature is not implemented yet. It will remember until you clear history",
+                            {
+                              variant: "info",
+                            }
+                          );
+                        }}
+                      />
                       <Text size="sm" color="blue" className={classes.pointer}>
                         Forgot password?
                       </Text>

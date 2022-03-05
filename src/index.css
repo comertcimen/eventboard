@@ -6,3 +6,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.active-navlink > button {
+  background: rgb(248, 249, 250);
+  border-right: 2px solid aqua;
+}

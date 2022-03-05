@@ -1,15 +1,14 @@
-import { Navigate, useLocation, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { State } from "src/store/accountReducer";
 import { useSelector } from "react-redux";
 
-export const RequireAuth = () => {
+export const NotFound = () => {
   const account = useSelector((state: State) => state.account);
   const { isLoggedIn } = account;
-  let location = useLocation();
 
   if (!isLoggedIn) {
-    return <Navigate to="/" state={{ from: location }} replace />;
+    return <Navigate to="/" />;
   }
 
-  return <Outlet />;
+  return <Navigate to="/dashboard" />;
 };
