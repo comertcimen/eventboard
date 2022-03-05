@@ -17,9 +17,14 @@ export const User: FC = () => {
 
   const nameAvatarize = () => {
     const seperate = user.name.split(" ");
-    return seperate.length === 1
-      ? seperate[0][0]
-      : `${seperate[0][0]}${seperate[1][0]}`;
+    switch (seperate.length) {
+      case 0:
+        return "";
+      case 1:
+        return seperate[0][0];
+      default:
+        return `${seperate[0][0]}${seperate[1][0]}`;
+    }
   };
 
   return (
