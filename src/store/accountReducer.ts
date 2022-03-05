@@ -5,7 +5,10 @@ export type State = {
   account: {
     token: string;
     isLoggedIn: boolean;
-    user: any;
+    user: {
+      email: string;
+      name: string;
+    };
   };
 };
 

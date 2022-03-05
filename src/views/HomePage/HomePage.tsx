@@ -115,7 +115,7 @@ export const HomePage = () => {
           type: LOGIN,
           payload: {
             isLoggedIn: true,
-            user: user.email,
+            user: { email: user.email, name: user.displayName },
             token: user.refreshToken,
           },
         });

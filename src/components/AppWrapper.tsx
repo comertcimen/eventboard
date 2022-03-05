@@ -87,11 +87,11 @@ export const AppWrapper = ({ children }: ChrildrenProps) => {
           <Navbar.Section mt="xs" grow component={ScrollArea}>
             {navbarItems.map((item, index) => (
               <NavLink
+                key={index}
                 to={item.to}
                 className={({ isActive }) => (isActive ? "active-navlink" : "")}
               >
                 <UnstyledButton
-                  key={index}
                   sx={{
                     display: "block",
                     width: "100%",

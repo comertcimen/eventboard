@@ -7,9 +7,20 @@ import {
 } from "@mantine/core";
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
 import { FC } from "react";
+import { useSelector } from "react-redux";
+import { State } from "src/store/accountReducer";
 
 export const User: FC = () => {
   const { classes, theme } = useStyles();
+  const account = useSelector((state: State) => state.account);
+  const { user } = account;
+
+  const nameAvatarize = () => {
+    const seperate = user.name.split(" ");
+    return seperate.length === 1
+      ? seperate[0][0]
+      : `${seperate[0][0]}${seperate[1][0]}`;
+  };
 
   return (
     <div
@@ -24,13 +35,13 @@ export const User: FC = () => {
     >
       <UnstyledButton className={classes.user}>
         <Group>
-          <Avatar radius="xl">CÇ</Avatar>
+          <Avatar radius="xl"> {nameAvatarize()}</Avatar>
           <div style={{ flex: 1 }}>
             <Text size="sm" weight={500}>
-              Cömert Çimen
+              {user.name}
             </Text>
             <Text color="dimmed" size="xs">
-              ccimen@uos.de
+              {user.email}
             </Text>
           </div>
 
