@@ -9,23 +9,12 @@ import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
 import { FC } from "react";
 import { useSelector } from "react-redux";
 import { State } from "src/store/accountReducer";
+import { nameAvatarize } from "src/utils";
 
 export const User: FC = () => {
   const { classes, theme } = useStyles();
   const account = useSelector((state: State) => state.account);
   const { user } = account;
-
-  const nameAvatarize = () => {
-    const seperate = user.name.split(" ");
-    switch (seperate.length) {
-      case 0:
-        return "";
-      case 1:
-        return seperate[0][0];
-      default:
-        return `${seperate[0][0]}${seperate[1][0]}`;
-    }
-  };
 
   return (
     <div
@@ -40,7 +29,7 @@ export const User: FC = () => {
     >
       <UnstyledButton className={classes.user}>
         <Group>
-          <Avatar radius="xl"> {nameAvatarize()}</Avatar>
+          <Avatar radius="xl"> {nameAvatarize(user.name)}</Avatar>
           <div style={{ flex: 1 }}>
             <Text size="sm" weight={500}>
               {user.name}

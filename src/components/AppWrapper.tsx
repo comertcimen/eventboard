@@ -1,7 +1,6 @@
 import {
   AppShell,
   Navbar,
-  Button,
   MediaQuery,
   Burger,
   Header,
@@ -9,7 +8,6 @@ import {
   UnstyledButton,
   Group,
   ScrollArea,
-  Image,
 } from "@mantine/core";
 import { useDispatch } from "react-redux";
 import { auth, ChrildrenProps } from "src/utils";
@@ -17,23 +15,16 @@ import { LOGOUT } from "src/store/actions";
 import { signOut } from "firebase/auth";
 import { headerHeight } from "src/constants/StyleConstants";
 import { useState } from "react";
-import AddIcon from "@mui/icons-material/Add";
-import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { User } from "src/views/DashboardPage/components/User";
-import Logo from "src/assets/event.svg";
-import { useMediaQuery } from "@mantine/hooks";
 import { NavLink } from "react-router-dom";
-import { useSnackbar } from "notistack";
+import { navbarItems } from "src/constants/NavbarItems";
+import { HeaderItems } from "src/components/HeaderItems";
 
 export const AppWrapper = ({ children }: ChrildrenProps) => {
   const dispatcher = useDispatch();
-  const { enqueueSnackbar } = useSnackbar();
 
   const [opened, setOpened] = useState(false);
-  const matches = useMediaQuery("(min-width: 500px)");
 
   const logOut = async () => {
     signOut(auth)
@@ -51,24 +42,6 @@ export const AppWrapper = ({ children }: ChrildrenProps) => {
         console.log("error", error);
       });
   };
-
-  const navbarItems = [
-    {
-      icon: <GridViewOutlinedIcon />,
-      label: "Dashboard",
-      to: "/dashboard",
-    },
-    {
-      icon: <CalendarTodayOutlinedIcon />,
-      label: "Calendar",
-      to: "/calendar",
-    },
-    {
-      icon: <ArchiveOutlinedIcon />,
-      label: "Past Events",
-      to: "/pastevents",
-    },
-  ];
 
   const toggleNavbar = () => {
     setOpened(!opened);
@@ -159,36 +132,7 @@ export const AppWrapper = ({ children }: ChrildrenProps) => {
               </UnstyledButton>
             </MediaQuery> */}
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <Group>
-                <Image
-                  src={Logo}
-                  alt="Logo"
-                  width={28}
-                  imageProps={{ draggable: false }}
-                />
-                {matches && <Text size="md">Event Board</Text>}
-              </Group>
-
-              <Button
-                variant="outline"
-                leftIcon={<AddIcon />}
-                onClick={() => {
-                  enqueueSnackbar("This feature is not implemented yet.", {
-                    variant: "info",
-                  });
-                }}
-              >
-                Create an Event
-              </Button>
-            </div>
+            <HeaderItems />
           </div>
         </Header>
       }

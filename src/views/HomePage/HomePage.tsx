@@ -27,11 +27,10 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { Timestamp, doc, setDoc } from "firebase/firestore";
 import { FormTypes } from "src/constants/FormTypes";
 import { useSnackbar } from "notistack";
-
-const borderRadius = 6;
+import { loginFormCardBorderRadius as borderRadius } from "src/constants/StyleConstants";
 
 export const HomePage = () => {
   const { classes } = useStyles();
@@ -115,8 +114,7 @@ export const HomePage = () => {
           type: LOGIN,
           payload: {
             isLoggedIn: true,
-            user: { email: user.email, name: user.displayName },
-            token: user.refreshToken,
+            user: { email: user.email, name: user.displayName, id: user.uid },
           },
         });
         setLoading(false);
@@ -143,12 +141,19 @@ export const HomePage = () => {
           displayName: `${name} ${surname}`,
         });
 
-        await addDoc(collection(db, "users"), {
+        await setDoc(doc(db, "users", user.uid), {
           email: email,
           name: name,
           surname: surname,
           createdAt: Timestamp.now(),
         });
+
+        /* await addDoc(collection(db, "users"), {
+          email: email,
+          name: name,
+          surname: surname,
+          createdAt: Timestamp.now(),
+        }); */
 
         sendEmailVerification(user);
         enqueueSnackbar(

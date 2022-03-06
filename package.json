@@ -8,8 +8,6 @@
     "@mantine/dates": "^3.6.11",
     "@mantine/hooks": "^3.6.11",
     "@mantine/modals": "^3.6.11",
-    "@mantine/notifications": "^3.6.11",
-    "@mantine/rte": "^3.6.11",
     "@mui/icons-material": "^5.4.2",
     "@react-firebase/auth": "^0.2.10",
     "@testing-library/jest-dom": "^5.16.2",

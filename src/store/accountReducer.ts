@@ -3,17 +3,16 @@ import { AnyAction } from "redux";
 
 export type State = {
   account: {
-    token: string;
     isLoggedIn: boolean;
     user: {
       email: string;
       name: string;
+      id: string;
     };
   };
 };
 
 export const initialState = {
-  token: "",
   isLoggedIn: false,
   user: null,
 };
@@ -32,7 +31,6 @@ const accountReducer = (state = initialState, action: AnyAction) => {
       return {
         ...state,
         isLoggedIn: false,
-        token: "",
         user: null,
       };
     }
