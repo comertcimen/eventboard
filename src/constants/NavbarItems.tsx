@@ -1,6 +1,7 @@
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
+import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
 
 export const navbarItems = [
   {
@@ -17,5 +18,10 @@ export const navbarItems = [
     icon: <ArchiveOutlinedIcon />,
     label: "Past Events",
     to: "/pastevents",
+  },
+  {
+    icon: <BookmarksOutlinedIcon />,
+    label: "Saved",
+    to: "/saved",
   },
 ];

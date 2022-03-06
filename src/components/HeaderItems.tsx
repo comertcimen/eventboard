@@ -62,6 +62,7 @@ export const HeaderItems: FC = () => {
         certainty,
         date: Date.parse(date as unknown as string),
         user: account.user.id,
+        createdAt: new Date().getTime(),
       });
     } catch (error) {
       console.log(error);

@@ -50,6 +50,7 @@ export const AppWrapper = ({ children }: ChrildrenProps) => {
     <AppShell
       navbarOffsetBreakpoint="sm"
       fixed
+      sx={{ background: "#EBEDF1" }}
       navbar={
         <Navbar
           padding="md"
