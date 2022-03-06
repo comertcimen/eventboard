@@ -5,7 +5,6 @@ import {
   Text,
   Group,
   Badge,
-  Button,
   Container,
   Menu,
   Divider,
@@ -67,7 +66,7 @@ export const Dashboard = () => {
         {data &&
           data.length > 0 &&
           data.map((item, index) => (
-            <Card shadow="sm" padding="lg" key={index}>
+            <Card shadow="sm" padding="lg" key={index} sx={{ width: "100%" }}>
               <Card.Section padding="md">
                 <div
                   style={{
