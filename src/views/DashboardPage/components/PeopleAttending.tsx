@@ -1,6 +1,12 @@
 import { Group, Popover, Text } from "@mantine/core";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { FC, useEffect, useState } from "react";
+import {
+  collection,
+  DocumentData,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { FC, useState } from "react";
 import { db } from "src/utils";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 
@@ -13,26 +19,32 @@ export const PeopleAttending: FC<Props> = ({ count, peopleAttending }) => {
   const [tooltipOpened, setTooltipOpened] = useState<boolean>(false);
   const [attendingNames, setAttendingNames] = useState<string[]>([]);
 
-  useEffect(() => {
-    const getAttendingPeopleNames = async () => {
-      if (peopleAttending.length > 0) {
-        const names: string[] = [];
+  const showTooltip = async () => {
+    if (peopleAttending.length > 0) {
+      const names: string[] = [];
 
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("__name__", "in", peopleAttending)); //TODO: this only works with max 10 people, find a better way
-        const data = await getDocs(q);
+      const usersRef = collection(db, "users");
 
-        data.docs.forEach((user) => {
-          const userData = user.data();
-          names.push(`${userData.name} ${userData.surname}`);
+      let promises: Promise<DocumentData>[] = [];
+
+      peopleAttending.forEach(async (item) => {
+        const q = query(usersRef, where("__name__", "==", item));
+        promises.push(getDocs(q));
+      });
+
+      Promise.all(promises)
+        .then((results) => {
+          results.forEach((result) => {
+            const userData = result.docs[0].data();
+            names.push(`${userData.name} ${userData.surname}`);
+          });
+        })
+        .then(() => {
+          setAttendingNames(names);
+          setTooltipOpened(true);
         });
-
-        setAttendingNames(names);
-      }
-    };
-
-    getAttendingPeopleNames();
-  }, [peopleAttending]);
+    }
+  };
 
   if (peopleAttending.length === 0) {
     return <></>;
@@ -53,7 +65,7 @@ export const PeopleAttending: FC<Props> = ({ count, peopleAttending }) => {
       }}
       target={
         <Group
-          onMouseEnter={() => setTooltipOpened(true)}
+          onMouseEnter={showTooltip}
           onMouseLeave={() => setTooltipOpened(false)}
           spacing={7}
         >
