@@ -1,11 +1,46 @@
 import { Button, Group } from "@mantine/core";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ModeCommentOutlinedIcon from "@mui/icons-material/ModeCommentOutlined";
 import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
 import { useMediaQuery } from "@mantine/hooks";
+import { FC } from "react";
+import {
+  doc,
+  arrayUnion,
+  arrayRemove,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
+import { db } from "src/utils";
 
-export const EventActions = () => {
+type Props = {
+  id: string | undefined;
+  me: string | undefined;
+  attending: boolean | undefined;
+};
+
+export const EventActions: FC<Props> = ({ id, me, attending }) => {
   const isSmall = useMediaQuery("(max-width: 500px)");
+
+  const eventRef = doc(db, "events", id as string);
+
+  const handleAttend = async () => {
+    const docSnap = await getDoc(eventRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      if (data?.peopleAttending && data.peopleAttending.includes(me)) {
+        await updateDoc(eventRef, {
+          peopleAttending: arrayRemove(me),
+        });
+      } else {
+        await updateDoc(eventRef, {
+          peopleAttending: arrayUnion(me),
+        });
+      }
+    }
+  };
   return (
     <Group
       noWrap={true}
@@ -18,13 +53,14 @@ export const EventActions = () => {
     >
       <Button
         variant="subtle"
-        color="gray"
+        color={attending ? "blue" : "gray"}
         size={isSmall ? "xs" : "sm"}
         sx={{
           padding: isSmall ? 0 : "",
         }}
         fullWidth
-        leftIcon={<ThumbUpOutlinedIcon />}
+        leftIcon={attending ? <ThumbUpIcon /> : <ThumbUpOutlinedIcon />}
+        onClick={handleAttend}
       >
         Attend
       </Button>

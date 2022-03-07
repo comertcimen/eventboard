@@ -11,16 +11,19 @@ import {
   ActionIcon,
   Avatar,
 } from "@mantine/core";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "src/utils";
 import dayjs from "dayjs";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { PeopleAttending, EventActions } from "./components/";
+import { useSelector } from "react-redux";
+import { State } from "src/store/accountReducer";
 
 interface DataType {
+  id?: string;
   title?: string;
   description?: string;
   certainty?: string;
@@ -28,10 +31,12 @@ interface DataType {
   image?: string;
   user?: string;
   createdAt?: number;
+  peopleAttending?: string[];
 }
 
 export const Dashboard = () => {
   const [data, setData] = useState<DataType[] | null>(null);
+  const account = useSelector((state: State) => state.account);
 
   useEffect(() => {
     const eventsRef = collection(db, "events");
@@ -41,7 +46,8 @@ export const Dashboard = () => {
 
       events.docs.forEach((event) => {
         if (event.exists()) {
-          tempData.push(event.data());
+          const data = event.data();
+          tempData.push({ id: event.id, ...data });
         }
       });
 
@@ -55,6 +61,10 @@ export const Dashboard = () => {
     return unsubscribe;
   }, []);
 
+  const deleteEvent = async (id: string) => {
+    await deleteDoc(doc(db, "events", id));
+  };
+
   return (
     <Container size="sm" padding="xs">
       <Center
@@ -65,8 +75,8 @@ export const Dashboard = () => {
       >
         {data &&
           data.length > 0 &&
-          data.map((item, index) => (
-            <Card shadow="sm" padding="lg" key={index} sx={{ width: "100%" }}>
+          data.map((item) => (
+            <Card shadow="sm" padding="lg" key={item.id} sx={{ width: "100%" }}>
               <Card.Section padding="md">
                 <div
                   style={{
@@ -87,24 +97,30 @@ export const Dashboard = () => {
                     <Text weight={500}>Cömert Çimen</Text>
                   </Group>
 
-                  <Menu
-                    control={
-                      <ActionIcon variant="transparent">
-                        <MoreHorizOutlinedIcon />
-                      </ActionIcon>
-                    }
-                  >
-                    <Menu.Label>Application</Menu.Label>
-                    <Menu.Item icon={<SettingsOutlinedIcon />}>
-                      Settings
-                    </Menu.Item>
-                    <Divider />
-                    <Menu.Label>Danger zone</Menu.Label>
+                  {account.user.id === item.user && (
+                    <Menu
+                      control={
+                        <ActionIcon variant="transparent">
+                          <MoreHorizOutlinedIcon />
+                        </ActionIcon>
+                      }
+                    >
+                      <Menu.Label>Actions</Menu.Label>
+                      <Menu.Item icon={<ModeEditOutlineOutlinedIcon />}>
+                        Edit
+                      </Menu.Item>
+                      <Divider />
+                      <Menu.Label>Danger zone</Menu.Label>
 
-                    <Menu.Item color="red" icon={<DeleteOutlineOutlinedIcon />}>
-                      Delete event
-                    </Menu.Item>
-                  </Menu>
+                      <Menu.Item
+                        color="red"
+                        icon={<DeleteOutlineOutlinedIcon />}
+                        onClick={() => deleteEvent(item.id as string)}
+                      >
+                        Delete
+                      </Menu.Item>
+                    </Menu>
+                  )}
                 </div>
               </Card.Section>
 
@@ -157,11 +173,24 @@ export const Dashboard = () => {
                     {dayjs(item.date).format("D MMM YYYY HH:mm")}
                   </Text>
 
-                  <PeopleAttending />
+                  <PeopleAttending
+                    count={
+                      (item?.peopleAttending && item.peopleAttending.length) ||
+                      0
+                    }
+                    peopleAttending={item?.peopleAttending || []}
+                  />
                 </div>
               </Card.Section>
 
-              <EventActions />
+              <EventActions
+                id={item.id}
+                me={account.user.id}
+                attending={
+                  item?.peopleAttending &&
+                  item.peopleAttending.includes(account.user.id)
+                }
+              />
             </Card>
           ))}
       </Center>

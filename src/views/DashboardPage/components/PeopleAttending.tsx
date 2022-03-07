@@ -1,8 +1,43 @@
-import { Popover, Text } from "@mantine/core";
-import { useState } from "react";
+import { Group, Popover, Text } from "@mantine/core";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { FC, useEffect, useState } from "react";
+import { db } from "src/utils";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 
-export const PeopleAttending = () => {
+type Props = {
+  count: number;
+  peopleAttending: string[];
+};
+
+export const PeopleAttending: FC<Props> = ({ count, peopleAttending }) => {
   const [tooltipOpened, setTooltipOpened] = useState<boolean>(false);
+  const [attendingNames, setAttendingNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    const getAttendingPeopleNames = async () => {
+      if (peopleAttending.length > 0) {
+        const names: string[] = [];
+
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("__name__", "in", peopleAttending)); //TODO: this only works with max 10 people, find a better way
+        const data = await getDocs(q);
+
+        data.docs.forEach((user) => {
+          const userData = user.data();
+          names.push(`${userData.name} ${userData.surname}`);
+        });
+
+        setAttendingNames(names);
+      }
+    };
+
+    getAttendingPeopleNames();
+  }, [peopleAttending]);
+
+  if (peopleAttending.length === 0) {
+    return <></>;
+  }
+
   return (
     <Popover
       opened={tooltipOpened}
@@ -17,49 +52,35 @@ export const PeopleAttending = () => {
         body: { pointerEvents: "none", background: "rgba(0,0,0,0.8)" },
       }}
       target={
-        <Text
-          size="sm"
+        <Group
           onMouseEnter={() => setTooltipOpened(true)}
           onMouseLeave={() => setTooltipOpened(false)}
-          sx={{
-            "&:hover": {
-              textDecoration: "underline",
-              cursor: "pointer",
-            },
-          }}
+          spacing={7}
         >
-          8 Attending
-        </Text>
+          <ThumbUpIcon
+            sx={{ color: "#228be6", fontSize: "1.1rem", cursor: "pointer" }}
+          />
+          <Text
+            size="sm"
+            sx={{
+              "&:hover": {
+                textDecoration: "underline",
+                cursor: "pointer",
+              },
+            }}
+          >
+            {`${count} Attending`}
+          </Text>
+        </Group>
       }
     >
       <div style={{ display: "flex", flexDirection: "column" }}>
-        <Text size="xs" color="white">
-          Cömert Çimen
-        </Text>
-        <Text size="xs" color="white">
-          Robin Horn
-        </Text>
-        <Text size="xs" color="white">
-          Test Name 1
-        </Text>
-        <Text size="xs" color="white">
-          Test Name 2
-        </Text>
-        <Text size="xs" color="white">
-          Test Name 3
-        </Text>
-        <Text size="xs" color="white">
-          Test Name 4
-        </Text>
-        <Text size="xs" color="white">
-          Test Name 5
-        </Text>
-        <Text size="xs" color="white">
-          Test Name 6
-        </Text>
-        <Text size="xs" color="white">
-          Test Name 7
-        </Text>
+        {attendingNames.length > 0 &&
+          attendingNames.map((name, index) => (
+            <Text size="xs" color="white" key={index}>
+              {name}
+            </Text>
+          ))}
       </div>
     </Popover>
   );
