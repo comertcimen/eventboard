@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "src/utils";
+import { db, nameAvatarize } from "src/utils";
 import dayjs from "dayjs";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
@@ -30,6 +30,7 @@ interface DataType {
   date?: number;
   image?: string;
   user?: string;
+  userName?: string;
   createdAt?: number;
   peopleAttending?: string[];
 }
@@ -47,7 +48,10 @@ export const Dashboard = () => {
       events.docs.forEach((event) => {
         if (event.exists()) {
           const data = event.data();
-          tempData.push({ id: event.id, ...data });
+          //TODO: This is a quick implementation. Must change date field to timestamp or date for the query.
+          //Otherwise pagination post count on every page will be different
+          if (dayjs(data.date) > dayjs(new Date()))
+            tempData.push({ id: event.id, ...data });
         }
       });
 
@@ -89,12 +93,10 @@ export const Dashboard = () => {
                   }}
                 >
                   <Group>
-                    <Avatar
-                      src="https://i.hizliresim.com/H5uEWE.jpg"
-                      radius="xl"
-                      imageProps={{ draggable: false }}
-                    />
-                    <Text weight={500}>Cömert Çimen</Text>
+                    <Avatar radius="xl" imageProps={{ draggable: false }}>
+                      {nameAvatarize(item.userName as string)}
+                    </Avatar>
+                    <Text weight={500}>{item.userName}</Text>
                   </Group>
 
                   {account.user.id === item.user && (

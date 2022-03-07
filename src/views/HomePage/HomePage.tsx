@@ -141,19 +141,14 @@ export const HomePage = () => {
           displayName: `${name} ${surname}`,
         });
 
+        //TODO: change uid with email.slice(0, email.indexOf('@'))
+
         await setDoc(doc(db, "users", user.uid), {
           email: email,
           name: name,
           surname: surname,
           createdAt: Timestamp.now(),
         });
-
-        /* await addDoc(collection(db, "users"), {
-          email: email,
-          name: name,
-          surname: surname,
-          createdAt: Timestamp.now(),
-        }); */
 
         sendEmailVerification(user);
         enqueueSnackbar(
