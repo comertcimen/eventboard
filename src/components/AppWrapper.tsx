@@ -20,9 +20,11 @@ import { User } from "src/views/DashboardPage/components/User";
 import { NavLink } from "react-router-dom";
 import { navbarItems } from "src/constants/NavbarItems";
 import { HeaderItems } from "src/components/HeaderItems";
+import { useMediaQuery } from "@mantine/hooks";
 
 export const AppWrapper = ({ children }: ChrildrenProps) => {
   const dispatcher = useDispatch();
+  const isSmall = useMediaQuery("(max-width: 798px)");
 
   const [opened, setOpened] = useState(false);
 
@@ -64,6 +66,7 @@ export const AppWrapper = ({ children }: ChrildrenProps) => {
                 key={index}
                 to={item.to}
                 className={({ isActive }) => (isActive ? "active-navlink" : "")}
+                onClick={() => isSmall && setOpened(false)}
               >
                 <UnstyledButton
                   sx={{
