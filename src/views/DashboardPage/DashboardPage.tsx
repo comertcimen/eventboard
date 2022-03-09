@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import { PeopleAttending, EventActions } from "./components/";
+import { PeopleAttending, EventActions, CardSkeletons } from "./components/";
 import { useSelector } from "react-redux";
 import { State } from "src/store/accountReducer";
 
@@ -38,8 +38,10 @@ interface DataType {
 export const Dashboard = () => {
   const [data, setData] = useState<DataType[] | null>(null);
   const account = useSelector((state: State) => state.account);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    setLoading(true);
     const eventsRef = collection(db, "events");
 
     const unsubscribe = onSnapshot(eventsRef, (events) => {
@@ -60,6 +62,7 @@ export const Dashboard = () => {
       });
 
       setData(sortedData);
+      setLoading(false);
     });
 
     return unsubscribe;
@@ -77,6 +80,7 @@ export const Dashboard = () => {
           gap: 40,
         }}
       >
+        {loading && <CardSkeletons amount={5} />}
         {data &&
           data.length > 0 &&
           data.map((item) => (
