@@ -29,9 +29,7 @@ export const User: FC = () => {
     >
       <UnstyledButton className={classes.user}>
         <Group>
-          <Avatar src="https://i.hizliresim.com/H5uEWE.jpg" radius="xl">
-            {nameAvatarize(user.name)}
-          </Avatar>
+          <Avatar radius="xl">{nameAvatarize(user.name)}</Avatar>
           <div style={{ flex: 1 }}>
             <Text size="sm" weight={500}>
               {user.name}
