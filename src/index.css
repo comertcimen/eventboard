@@ -16,3 +16,9 @@ a {
   background: rgb(248, 249, 250);
   border-right: 2px solid aqua;
 }
+
+.ChatFooter {
+  position: sticky !important;
+  bottom: 0px;
+  padding-bottom: 5px !important;
+}

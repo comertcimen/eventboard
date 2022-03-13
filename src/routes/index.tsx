@@ -6,7 +6,7 @@ import {
   Calendar,
   PastEvents,
   Saved,
-  Chat,
+  ChatPage,
 } from "src/views";
 import { AppWrapper } from "src/components";
 import { RequireAuth } from "src/utils";
@@ -57,7 +57,7 @@ export const CustomRoutes = () => {
           path="/chat"
           element={
             <AppWrapper>
-              <Chat />
+              <ChatPage />
             </AppWrapper>
           }
         />

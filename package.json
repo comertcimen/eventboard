@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@chatui/core": "^1.3.0",
     "@emotion/styled": "^11.8.1",
     "@mantine/core": "^3.6.11",
     "@mantine/dates": "^3.6.11",
