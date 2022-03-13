@@ -2,7 +2,7 @@ import { Button, Group } from "@mantine/core";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ModeCommentOutlinedIcon from "@mui/icons-material/ModeCommentOutlined";
-import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
+import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import { useMediaQuery } from "@mantine/hooks";
 import { FC } from "react";
 import {
@@ -84,7 +84,7 @@ export const EventActions: FC<Props> = ({ id, me, attending }) => {
           padding: isSmall ? 0 : "",
         }}
         fullWidth
-        leftIcon={<BookmarksOutlinedIcon />}
+        leftIcon={<BookmarkBorderOutlinedIcon />}
       >
         Save
       </Button>
