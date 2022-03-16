@@ -5,14 +5,6 @@ import ModeCommentOutlinedIcon from "@mui/icons-material/ModeCommentOutlined";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import { useMediaQuery } from "@mantine/hooks";
 import { FC } from "react";
-import {
-  doc,
-  arrayUnion,
-  arrayRemove,
-  updateDoc,
-  getDoc,
-} from "firebase/firestore";
-import { db } from "src/utils";
 
 type Props = {
   id: string | undefined;
@@ -23,12 +15,11 @@ type Props = {
 export const EventActions: FC<Props> = ({ id, me, attending }) => {
   const isSmall = useMediaQuery("(max-width: 500px)");
 
-  const eventRef = doc(db, "events", id as string);
+  //const eventRef = doc(db, "events", id as string);
 
   const handleAttend = async () => {
-    const docSnap = await getDoc(eventRef);
-
-    if (docSnap.exists()) {
+    //const docSnap = await getDoc(eventRef);
+    /* if (docSnap.exists()) {
       const data = docSnap.data();
       if (data?.peopleAttending && data.peopleAttending.includes(me)) {
         await updateDoc(eventRef, {
@@ -39,7 +30,7 @@ export const EventActions: FC<Props> = ({ id, me, attending }) => {
           peopleAttending: arrayUnion(me),
         });
       }
-    }
+    } */
   };
   return (
     <Group

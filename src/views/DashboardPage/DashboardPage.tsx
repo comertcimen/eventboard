@@ -11,16 +11,13 @@ import {
   ActionIcon,
   Avatar,
 } from "@mantine/core";
-import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db, nameAvatarize } from "src/utils";
+import { nameAvatarize } from "src/utils";
 import dayjs from "dayjs";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { PeopleAttending, EventActions, CardSkeletons } from "./components/";
-import { useSelector } from "react-redux";
-import { State } from "src/store/accountReducer";
 
 interface DataType {
   id?: string;
@@ -37,10 +34,9 @@ interface DataType {
 
 export const Dashboard = () => {
   const [data, setData] = useState<DataType[] | null>(null);
-  const account = useSelector((state: State) => state.account);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
+  /* useEffect(() => {
     setLoading(true);
     const eventsRef = collection(db, "events");
 
@@ -66,10 +62,10 @@ export const Dashboard = () => {
     });
 
     return unsubscribe;
-  }, []);
+  }, []); */
 
   const deleteEvent = async (id: string) => {
-    await deleteDoc(doc(db, "events", id));
+    //await deleteDoc(doc(db, "events", id));
   };
 
   return (
@@ -103,7 +99,7 @@ export const Dashboard = () => {
                     <Text weight={500}>{item.userName}</Text>
                   </Group>
 
-                  {account.user.id === item.user && (
+                  {/*  {account.user.id === item.user && (
                     <Menu
                       control={
                         <ActionIcon variant="transparent">
@@ -126,7 +122,7 @@ export const Dashboard = () => {
                         Delete
                       </Menu.Item>
                     </Menu>
-                  )}
+                  )} */}
                 </div>
               </Card.Section>
 
@@ -189,14 +185,14 @@ export const Dashboard = () => {
                 </div>
               </Card.Section>
 
-              <EventActions
+              {/* <EventActions
                 id={item.id}
                 me={account.user.id}
                 attending={
                   item?.peopleAttending &&
                   item.peopleAttending.includes(account.user.id)
                 }
-              />
+              /> */}
             </Card>
           ))}
       </Center>

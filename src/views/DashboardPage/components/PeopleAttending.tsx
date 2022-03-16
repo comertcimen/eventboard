@@ -1,13 +1,5 @@
 import { Group, Popover, Text } from "@mantine/core";
-import {
-  collection,
-  DocumentData,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
 import { FC, useState } from "react";
-import { db } from "src/utils";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 
 type Props = {
@@ -20,7 +12,7 @@ export const PeopleAttending: FC<Props> = ({ count, peopleAttending }) => {
   const [attendingNames, setAttendingNames] = useState<string[]>([]);
 
   const showTooltip = async () => {
-    if (peopleAttending.length > 0) {
+    /* if (peopleAttending.length > 0) {
       const names: string[] = [];
 
       const usersRef = collection(db, "users");
@@ -43,7 +35,7 @@ export const PeopleAttending: FC<Props> = ({ count, peopleAttending }) => {
           setAttendingNames(names);
           setTooltipOpened(true);
         });
-    }
+    } */
   };
 
   if (peopleAttending.length === 0) {

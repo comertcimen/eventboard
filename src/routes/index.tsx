@@ -7,9 +7,9 @@ import {
   PastEvents,
   Saved,
   ChatPage,
+  UserDetails,
 } from "src/views";
-import { AppWrapper } from "src/components";
-import { RequireAuth } from "src/utils";
+import { AppWrapper, RequireAuth } from "src/components";
 
 export const CustomRoutes = () => {
   return (
@@ -58,6 +58,15 @@ export const CustomRoutes = () => {
           element={
             <AppWrapper>
               <ChatPage />
+            </AppWrapper>
+          }
+        />
+
+        <Route
+          path="/u/:id"
+          element={
+            <AppWrapper>
+              <UserDetails />
             </AppWrapper>
           }
         />

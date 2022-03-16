@@ -15,13 +15,8 @@ import { useMediaQuery, useForm } from "@mantine/hooks";
 import AddIcon from "@mui/icons-material/Add";
 import Logo from "src/assets/event.svg";
 import { DatePicker, TimeInput } from "@mantine/dates";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "src/utils";
-import { useSelector } from "react-redux";
-import { State } from "src/store/accountReducer";
 
 export const HeaderItems: FC = () => {
-  const account = useSelector((state: State) => state.account);
   const matches = useMediaQuery("(min-width: 500px)");
   const [loading, setLoading] = useState<boolean>(false);
   const [opened, setOpened] = useState<boolean>(false);
@@ -55,7 +50,7 @@ export const HeaderItems: FC = () => {
     date.setMinutes(time.getMinutes());
     date.setSeconds(0);
 
-    try {
+    /* try {
       await addDoc(collection(db, "events"), {
         title,
         description,
@@ -70,7 +65,7 @@ export const HeaderItems: FC = () => {
     } finally {
       setLoading(false);
       closeForm();
-    }
+    } */
   };
 
   return (

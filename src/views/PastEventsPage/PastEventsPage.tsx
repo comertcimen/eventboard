@@ -8,9 +8,8 @@ import {
   Container,
   Avatar,
 } from "@mantine/core";
-import { collection, onSnapshot } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { db, nameAvatarize } from "src/utils";
+import { useState } from "react";
+import { nameAvatarize } from "src/utils";
 import dayjs from "dayjs";
 
 interface DataType {
@@ -27,7 +26,7 @@ interface DataType {
 export const PastEvents = () => {
   const [data, setData] = useState<DataType[] | null>(null);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const eventsRef = collection(db, "events");
 
     const unsubscribe = onSnapshot(eventsRef, (events) => {
@@ -49,7 +48,7 @@ export const PastEvents = () => {
     });
 
     return unsubscribe;
-  }, []);
+  }, []); */
 
   return (
     <Container size="sm" padding="xs">

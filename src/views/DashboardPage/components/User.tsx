@@ -7,14 +7,12 @@ import {
 } from "@mantine/core";
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
 import { FC } from "react";
-import { useSelector } from "react-redux";
-import { State } from "src/store/accountReducer";
-import { nameAvatarize } from "src/utils";
+import { NavLink } from "react-router-dom";
+import { nameAvatarize, supabase } from "src/utils";
 
 export const User: FC = () => {
   const { classes, theme } = useStyles();
-  const account = useSelector((state: State) => state.account);
-  const { user } = account;
+  const user = supabase.auth.user();
 
   return (
     <div
@@ -27,21 +25,27 @@ export const User: FC = () => {
         }`,
       }}
     >
-      <UnstyledButton className={classes.user}>
-        <Group>
-          <Avatar radius="xl">{nameAvatarize(user.name)}</Avatar>
-          <div style={{ flex: 1 }}>
-            <Text size="sm" weight={500}>
-              {user.name}
-            </Text>
-            <Text color="dimmed" size="xs">
-              {user.email}
-            </Text>
-          </div>
+      <NavLink to={`/u/${user?.user_metadata.username}`}>
+        <UnstyledButton className={classes.user}>
+          <Group>
+            <Avatar radius="xl">
+              {nameAvatarize(
+                `${user?.user_metadata.name} ${user?.user_metadata.surname}`
+              )}
+            </Avatar>
+            <div style={{ flex: 1 }}>
+              <Text size="sm" weight={500}>
+                {`${user?.user_metadata.name} ${user?.user_metadata.surname}`}
+              </Text>
+              <Text color="dimmed" size="xs">
+                {user?.email}
+              </Text>
+            </div>
 
-          <ChevronRightOutlinedIcon width={18} height={18} />
-        </Group>
-      </UnstyledButton>
+            <ChevronRightOutlinedIcon width={18} height={18} />
+          </Group>
+        </UnstyledButton>
+      </NavLink>
     </div>
   );
 };

@@ -1,8 +1,5 @@
-import { useSelector, useDispatch } from "react-redux";
 import { Navigate } from "react-router-dom";
-import { State } from "src/store/accountReducer";
 import {
-  Checkbox,
   Image,
   PasswordInput,
   TextInput,
@@ -18,28 +15,18 @@ import { useState } from "react";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
-import { LOGIN } from "src/store/actions";
-import { auth, db } from "src/utils";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  updateProfile,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
-import { Timestamp, doc, setDoc } from "firebase/firestore";
 import { FormTypes } from "src/constants/FormTypes";
 import { useSnackbar } from "notistack";
 import { loginFormCardBorderRadius as borderRadius } from "src/constants/StyleConstants";
+import { emailToUsername, supabase } from "src/utils";
 
 export const HomePage = () => {
   const { classes } = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const account = useSelector((state: State) => state.account);
-  const { isLoggedIn } = account;
-  const dispatcher = useDispatch();
   const [formType, setFormType] = useState<"login" | "register">("login");
   const [loading, setLoading] = useState<boolean>(false);
+
+  const session = supabase.auth.session();
 
   const loginForm = useForm({
     initialValues: {
@@ -93,79 +80,56 @@ export const HomePage = () => {
     },
   });
 
-  const handleLogin = (values: { email: string; password: string }) => {
+  const handleLogin = async (values: { email: string; password: string }) => {
     const { email, password } = values;
     setLoading(true);
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
+    const { error } = await supabase.auth.signIn({
+      email,
+      password,
+    });
 
-        if (!user.emailVerified) {
-          signOut(auth);
-          enqueueSnackbar("Please verify your email.", {
-            variant: "warning",
-          });
-          setLoading(false);
-          return;
-        }
-
-        await dispatcher({
-          type: LOGIN,
-          payload: {
-            isLoggedIn: true,
-            user: { email: user.email, name: user.displayName, id: user.uid },
-          },
-        });
-        setLoading(false);
-        return;
-      })
-      .catch((error) => {
-        enqueueSnackbar(error.message, {
-          variant: "error",
-        });
-
-        setLoading(false);
+    if (error) {
+      enqueueSnackbar(error.message, {
+        variant: "error",
       });
+    }
+
+    setLoading(false);
   };
 
-  const handleRegister = (values: FormTypes) => {
+  const handleRegister = async (values: FormTypes) => {
     const { email, password, name, surname } = values;
+    const username = emailToUsername(email);
     setLoading(true);
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
+    const { error } = await supabase.auth.signUp(
+      {
+        email,
+        password,
+      },
+      {
+        data: {
+          name,
+          surname,
+          username,
+        },
+      }
+    );
 
-        updateProfile(user, {
-          displayName: `${name} ${surname}`,
-        });
-
-        //TODO: change uid with email.slice(0, email.indexOf('@'))
-
-        await setDoc(doc(db, "users", user.uid), {
-          email: email,
-          name: name,
-          surname: surname,
-          createdAt: Timestamp.now(),
-        });
-
-        sendEmailVerification(user);
-        enqueueSnackbar(
-          "Account is created. Please verify your email to login.",
-          {
-            variant: "success",
-          }
-        );
-        registerForm.reset();
-        setLoading(false);
-      })
-      .catch((error) => {
-        enqueueSnackbar(error.message, {
-          variant: "error",
-        });
-        setLoading(false);
+    if (error) {
+      enqueueSnackbar(error.message, {
+        variant: "error",
       });
+      setLoading(false);
+      return;
+    }
+
+    enqueueSnackbar("Account is created. Please verify your email to login.", {
+      variant: "success",
+    });
+
+    setLoading(false);
   };
 
   const switchToRegisterView = () => {
@@ -178,7 +142,7 @@ export const HomePage = () => {
     registerForm.reset();
   };
 
-  if (isLoggedIn) {
+  if (session) {
     return <Navigate to="/dashboard" />;
   }
   return (
@@ -222,41 +186,30 @@ export const HomePage = () => {
                       {...loginForm.getInputProps("password")}
                     />
 
-                    <div className={classes.forgotPassword}>
-                      <Checkbox
-                        label="Remember me"
-                        onClick={() => {
-                          enqueueSnackbar(
-                            "This feature is not implemented yet. It will remember until you clear history",
-                            {
-                              variant: "info",
-                            }
-                          );
-                        }}
-                      />
-                      <Text size="sm" color="blue" className={classes.pointer}>
-                        Forgot password?
-                      </Text>
-                    </div>
-
                     <Button fullWidth type="submit">
                       {loading ? <Loader size="sm" color="lime" /> : "Login"}
                     </Button>
 
-                    <span className={classes.notRegistered}>
-                      <Text size="sm" color="grey">
-                        Not registered yet?
-                      </Text>
+                    <div className={classes.forgotPassword}>
+                      <span className={classes.notRegistered}>
+                        <Text size="sm" color="grey">
+                          Not registered yet?
+                        </Text>
 
-                      <Text
-                        size="sm"
-                        color="blue"
-                        className={classes.pointer}
-                        onClick={switchToRegisterView}
-                      >
-                        Create an account
+                        <Text
+                          size="sm"
+                          color="blue"
+                          className={classes.pointer}
+                          onClick={switchToRegisterView}
+                        >
+                          Create an account
+                        </Text>
+                      </span>
+
+                      <Text size="sm" color="blue" className={classes.pointer}>
+                        Forgot password?
                       </Text>
-                    </span>
+                    </div>
                   </>
                 )}
 

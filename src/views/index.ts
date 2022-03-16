@@ -5,3 +5,4 @@ export * from "./CalendarPage/CalendarPage";
 export * from "./PastEventsPage/PastEventsPage";
 export * from "./SavedPage/SavedPage";
 export * from "./ChatPage/ChatPage";
+export * from "./UserDetailsPage/UserDetailsPage";

@@ -1,19 +1,8 @@
 import Chat, { Bubble, MessageProps, useMessages } from "@chatui/core";
 import "@chatui/core/dist/index.css";
-import {
-  addDoc,
-  collection,
-  Timestamp,
-  query,
-  orderBy,
-  getDocs,
-  getDoc,
-  doc,
-} from "firebase/firestore";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { State } from "src/store/accountReducer";
-import { db, hashCode, intToRGB, emailToUsername } from "src/utils";
+import { hashCode, intToRGB, emailToUsername } from "src/utils";
 import { Text } from "@mantine/core";
 import { useSnackbar } from "notistack";
 
@@ -32,11 +21,10 @@ interface DataType {
 }
 
 export const ChatPage = () => {
-  const user = useSelector((state: State) => state.account).user;
   const { enqueueSnackbar } = useSnackbar();
   const { messages, prependMsgs, appendMsg } = useMessages([]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const getData = async () => {
       const messagesRef = collection(db, "messages");
       const q = query(messagesRef, orderBy("createdAt"));
@@ -69,10 +57,10 @@ export const ChatPage = () => {
     };
 
     getData();
-  }, [prependMsgs, user.id]);
+  }, [prependMsgs, user.id]); */
 
   const handleSend = async (type: string, val: string) => {
-    if (type === "text" && val.trim()) {
+    /* if (type === "text" && val.trim()) {
       try {
         const response = await addDoc(collection(db, "messages"), {
           type: "text",
@@ -110,7 +98,7 @@ export const ChatPage = () => {
           variant: "error",
         });
       }
-    }
+    } */
   };
 
   const renderMessageContent = (msg: MessageProps) => {

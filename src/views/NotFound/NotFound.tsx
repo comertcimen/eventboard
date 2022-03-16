@@ -1,12 +1,10 @@
 import { Navigate } from "react-router-dom";
-import { State } from "src/store/accountReducer";
-import { useSelector } from "react-redux";
+import { supabase } from "src/utils";
 
 export const NotFound = () => {
-  const account = useSelector((state: State) => state.account);
-  const { isLoggedIn } = account;
+  const session = supabase.auth.session();
 
-  if (!isLoggedIn) {
+  if (!session) {
     return <Navigate to="/" />;
   }
 

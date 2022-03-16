@@ -9,40 +9,33 @@ import {
   Group,
   ScrollArea,
 } from "@mantine/core";
-import { useDispatch } from "react-redux";
-import { auth, ChrildrenProps } from "src/utils";
-import { LOGOUT } from "src/store/actions";
-import { signOut } from "firebase/auth";
+import { ChrildrenProps, supabase } from "src/utils";
 import { headerHeight } from "src/constants/StyleConstants";
 import { useState } from "react";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { User } from "src/views/DashboardPage/components/User";
 import { NavLink } from "react-router-dom";
-import { navbarItems } from "src/constants/NavbarItems";
+import { navbarItems } from "src/components/NavbarItems";
 import { HeaderItems } from "src/components/HeaderItems";
 import { useMediaQuery } from "@mantine/hooks";
+import { useSnackbar } from "notistack";
 
 export const AppWrapper = ({ children }: ChrildrenProps) => {
-  const dispatcher = useDispatch();
   const isSmall = useMediaQuery("(max-width: 798px)");
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const [opened, setOpened] = useState(false);
 
   const logOut = async () => {
-    signOut(auth)
-      .then(async () => {
-        await dispatcher({
-          type: LOGOUT,
-          payload: {
-            isLoggedIn: false,
-            user: "",
-            token: "",
-          },
-        });
-      })
-      .catch((error) => {
-        console.log("error", error);
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      enqueueSnackbar(error.message, {
+        variant: "error",
       });
+      return;
+    }
   };
 
   const toggleNavbar = () => {
