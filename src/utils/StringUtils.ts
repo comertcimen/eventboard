@@ -10,6 +10,10 @@ export const nameAvatarize = (name: string): string => {
   }
 };
 
+export const fullName = (name: string, surname: string): string => {
+  return `${name} ${surname}`;
+};
+
 export const hashCode = (str: string) => {
   var hash = 0;
   for (var i = 0; i < str.length; i++) {

@@ -35,14 +35,12 @@ export const HomePage = () => {
     },
 
     validationRules: {
-      email: (value) =>
-        new RegExp("^\\w+([-+.']w+)*@uos.de$").test(value) ||
-        new RegExp("^\\w+([-+.']w+)*@uni-osnabrueck.de$").test(value),
+      //email: (value) => new RegExp("^\\w+([-+.']w+)*@uos.de$").test(value),
       password: (value) => value !== "",
     },
 
     errorMessages: {
-      email: "Email must be a valid uni email",
+      email: "Email must be a valid uni email e.g: username@uos.de",
       password: "Password must be filled",
     },
   });
@@ -57,9 +55,7 @@ export const HomePage = () => {
     },
 
     validationRules: {
-      email: (value) =>
-        new RegExp("^\\w+([-+.']w+)*@uos.de$").test(value) ||
-        new RegExp("^\\w+([-+.']w+)*@uni-osnabrueck.de$").test(value),
+      //email: (value) => new RegExp("^\\w+([-+.']w+)*@uos.de$").test(value),
       password: (value) =>
         /^(?!.*\s)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]).{8,16}$/.test(
           value
@@ -71,7 +67,7 @@ export const HomePage = () => {
     },
 
     errorMessages: {
-      email: "Email must be a valid uni email",
+      email: "Email must be a valid uni email e.g: username@uos.de",
       password:
         "Enter a combination of at least six letters(uppercase and lowercase), numbers, and special characters !@#$%^&*()--+={}",
       confirmPassword: "Passwords don't match. Try again",
@@ -130,6 +126,7 @@ export const HomePage = () => {
     });
 
     setLoading(false);
+    registerForm.reset();
   };
 
   const switchToRegisterView = () => {

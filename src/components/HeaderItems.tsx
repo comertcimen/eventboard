@@ -15,11 +15,18 @@ import { useMediaQuery, useForm } from "@mantine/hooks";
 import AddIcon from "@mui/icons-material/Add";
 import Logo from "src/assets/event.svg";
 import { DatePicker, TimeInput } from "@mantine/dates";
+import { supabase, user } from "src/utils";
+import { useSnackbar } from "notistack";
+import { useDispatch } from "react-redux";
+import { TRIGGEREVENTS } from "src/store/actions";
 
 export const HeaderItems: FC = () => {
   const matches = useMediaQuery("(min-width: 500px)");
   const [loading, setLoading] = useState<boolean>(false);
   const [opened, setOpened] = useState<boolean>(false);
+  const dispatcher = useDispatch();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const form = useForm({
     initialValues: {
@@ -50,22 +57,26 @@ export const HeaderItems: FC = () => {
     date.setMinutes(time.getMinutes());
     date.setSeconds(0);
 
-    /* try {
-      await addDoc(collection(db, "events"), {
+    const { error } = await supabase.from("events").insert([
+      {
+        user_id: user?.id,
         title,
         description,
         certainty,
-        date: Date.parse(date as unknown as string),
-        user: account.user.id,
-        createdAt: new Date().getTime(),
-        userName: account.user.name,
+        event_date: date,
+      },
+    ]);
+
+    if (error) {
+      enqueueSnackbar(error.message, {
+        variant: "error",
       });
-    } catch (error) {
-      console.log(error);
-    } finally {
       setLoading(false);
-      closeForm();
-    } */
+      return;
+    }
+    setLoading(false);
+    closeForm();
+    await dispatcher({ type: TRIGGEREVENTS });
   };
 
   return (
@@ -120,7 +131,6 @@ export const HeaderItems: FC = () => {
           />
           <Textarea
             label="Description"
-            required
             {...form.getInputProps("description")}
           />
           <RadioGroup

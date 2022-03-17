@@ -5,32 +5,28 @@ import ModeCommentOutlinedIcon from "@mui/icons-material/ModeCommentOutlined";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import { useMediaQuery } from "@mantine/hooks";
 import { FC } from "react";
+import { AttendingPeopleInterface } from "src/constants";
+import { supabase, user } from "src/utils";
 
 type Props = {
-  id: string | undefined;
-  me: string | undefined;
-  attending: boolean | undefined;
+  id: string;
+  attendingPeople: AttendingPeopleInterface[];
 };
 
-export const EventActions: FC<Props> = ({ id, me, attending }) => {
+export const EventActions: FC<Props> = ({ id, attendingPeople }) => {
   const isSmall = useMediaQuery("(max-width: 500px)");
 
-  //const eventRef = doc(db, "events", id as string);
+  const filtered = attendingPeople.filter((item) => item.user_id === user?.id);
+  const amIAttending = filtered.length > 0;
 
   const handleAttend = async () => {
-    //const docSnap = await getDoc(eventRef);
-    /* if (docSnap.exists()) {
-      const data = docSnap.data();
-      if (data?.peopleAttending && data.peopleAttending.includes(me)) {
-        await updateDoc(eventRef, {
-          peopleAttending: arrayRemove(me),
-        });
-      } else {
-        await updateDoc(eventRef, {
-          peopleAttending: arrayUnion(me),
-        });
-      }
-    } */
+    if (amIAttending) {
+      await supabase.from("people_attending").delete().match({ event_id: id });
+    } else {
+      await supabase
+        .from("people_attending")
+        .insert([{ user_id: user?.id, event_id: id }]);
+    }
   };
   return (
     <Group
@@ -44,13 +40,13 @@ export const EventActions: FC<Props> = ({ id, me, attending }) => {
     >
       <Button
         variant="subtle"
-        color={attending ? "blue" : "gray"}
+        color={amIAttending ? "blue" : "gray"}
         size={isSmall ? "xs" : "sm"}
         sx={{
           padding: isSmall ? 0 : "",
         }}
         fullWidth
-        leftIcon={attending ? <ThumbUpIcon /> : <ThumbUpOutlinedIcon />}
+        leftIcon={amIAttending ? <ThumbUpIcon /> : <ThumbUpOutlinedIcon />}
         onClick={handleAttend}
       >
         Attend

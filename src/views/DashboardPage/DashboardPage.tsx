@@ -10,66 +10,83 @@ import {
   Divider,
   ActionIcon,
   Avatar,
+  Dialog,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { nameAvatarize } from "src/utils";
+import {
+  fullName,
+  nameAvatarize,
+  smoothScrollTop,
+  supabase,
+  user,
+} from "src/utils";
 import dayjs from "dayjs";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { PeopleAttending, EventActions, CardSkeletons } from "./components/";
-
-interface DataType {
-  id?: string;
-  title?: string;
-  description?: string;
-  certainty?: string;
-  date?: number;
-  image?: string;
-  user?: string;
-  userName?: string;
-  createdAt?: number;
-  peopleAttending?: string[];
-}
+import { useSnackbar } from "notistack";
+import { useDispatch } from "react-redux";
+import { useEvents } from "src/hooks/useEvents";
+import { TRIGGEREVENTS } from "src/store/actions";
+import { headerHeight } from "src/constants";
+import { useMediaQuery } from "@mantine/hooks";
 
 export const Dashboard = () => {
-  const [data, setData] = useState<DataType[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  /* useEffect(() => {
-    setLoading(true);
-    const eventsRef = collection(db, "events");
-
-    const unsubscribe = onSnapshot(eventsRef, (events) => {
-      let tempData: DataType[] = [];
-
-      events.docs.forEach((event) => {
-        if (event.exists()) {
-          const data = event.data();
-          //TODO: This is a quick implementation. Must change date field to timestamp or date for the query.
-          //Otherwise pagination post count on every page will be different
-          if (dayjs(data.date) > dayjs(new Date()))
-            tempData.push({ id: event.id, ...data });
-        }
-      });
-
-      const sortedData = tempData.sort((a, b) => {
-        return dayjs(b.createdAt).diff(dayjs(a.createdAt));
-      });
-
-      setData(sortedData);
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []); */
+  const dispatcher = useDispatch();
+  const { events, loading } = useEvents();
+  const { enqueueSnackbar } = useSnackbar();
+  const [newPost, setNewPost] = useState<boolean>(false);
+  const isSmall = useMediaQuery("(max-width: 768px)");
 
   const deleteEvent = async (id: string) => {
-    //await deleteDoc(doc(db, "events", id));
+    await supabase.from("people_attending").delete().match({ event_id: id });
+    const { error } = await supabase.from("events").delete().match({ id });
+
+    if (error) {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+      return;
+    }
+
+    await dispatcher({ type: TRIGGEREVENTS });
   };
+
+  const handleNewPost = async () => {
+    await dispatcher({ type: TRIGGEREVENTS });
+    setNewPost(false);
+    smoothScrollTop();
+  };
+
+  useEffect(() => {
+    supabase
+      .from("events")
+      .on("INSERT", (payload) => {
+        if (payload.new.user_id !== user?.id) {
+          setNewPost(true);
+        }
+      })
+      .subscribe();
+  }, []);
 
   return (
     <Container size="sm" padding="xs">
+      <Dialog
+        opened={newPost}
+        onClick={handleNewPost}
+        size="sm"
+        radius="xl"
+        transition="slide-down"
+        sx={{ textAlign: "center", cursor: "pointer" }}
+        position={{
+          top: headerHeight + 10,
+          left: isSmall ? "calc(50% - 100px)" : "calc(50% + 50px)",
+        }}
+      >
+        <Text size="sm">New events available</Text>
+      </Dialog>
+
       <Center
         sx={{
           flexDirection: "column",
@@ -77,9 +94,9 @@ export const Dashboard = () => {
         }}
       >
         {loading && <CardSkeletons amount={5} />}
-        {data &&
-          data.length > 0 &&
-          data.map((item) => (
+        {events &&
+          events.length > 0 &&
+          events.map((item) => (
             <Card shadow="sm" padding="lg" key={item.id} sx={{ width: "100%" }}>
               <Card.Section padding="md">
                 <div
@@ -89,17 +106,23 @@ export const Dashboard = () => {
                     alignItems: "center",
                     flexWrap: "nowrap",
                     padding: 20,
-                    borderBottom: item.image ? "" : "1px solid rgba(0,0,0,0.1)",
+                    borderBottom: item.images
+                      ? ""
+                      : "1px solid rgba(0,0,0,0.1)",
                   }}
                 >
                   <Group>
                     <Avatar radius="xl" imageProps={{ draggable: false }}>
-                      {nameAvatarize(item.userName as string)}
+                      {nameAvatarize(
+                        fullName(item.user.name, item.user.surname)
+                      )}
                     </Avatar>
-                    <Text weight={500}>{item.userName}</Text>
+                    <Text weight={500}>
+                      {fullName(item.user.name, item.user.surname)}
+                    </Text>
                   </Group>
 
-                  {/*  {account.user.id === item.user && (
+                  {user?.id === item.user_id && (
                     <Menu
                       control={
                         <ActionIcon variant="transparent">
@@ -117,18 +140,18 @@ export const Dashboard = () => {
                       <Menu.Item
                         color="red"
                         icon={<DeleteOutlineOutlinedIcon />}
-                        onClick={() => deleteEvent(item.id as string)}
+                        onClick={() => deleteEvent(item.id)}
                       >
                         Delete
                       </Menu.Item>
                     </Menu>
-                  )} */}
+                  )}
                 </div>
               </Card.Section>
 
-              {item.image && (
+              {item.images && item.images.length === 1 && (
                 <Card.Section>
-                  <Image src={item.image} fit="contain" alt={item.title} />
+                  <Image src={item.images[0]} fit="contain" alt={item.title} />
                 </Card.Section>
               )}
 
@@ -172,27 +195,20 @@ export const Dashboard = () => {
                       padding: "3px 8px",
                     }}
                   >
-                    {dayjs(item.date).format("D MMM YYYY HH:mm")}
+                    {dayjs(item.event_date).format("D MMM YYYY HH:mm")}
                   </Text>
 
                   <PeopleAttending
-                    count={
-                      (item?.peopleAttending && item.peopleAttending.length) ||
-                      0
-                    }
-                    peopleAttending={item?.peopleAttending || []}
+                    count={item.people_attending.length}
+                    peopleAttending={item?.people_attending}
                   />
                 </div>
               </Card.Section>
 
-              {/* <EventActions
+              <EventActions
                 id={item.id}
-                me={account.user.id}
-                attending={
-                  item?.peopleAttending &&
-                  item.peopleAttending.includes(account.user.id)
-                }
-              /> */}
+                attendingPeople={item.people_attending}
+              />
             </Card>
           ))}
       </Center>

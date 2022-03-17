@@ -1,10 +1,11 @@
 import { Group, Popover, Text } from "@mantine/core";
 import { FC, useState } from "react";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import { AttendingPeopleInterface } from "src/constants";
 
 type Props = {
   count: number;
-  peopleAttending: string[];
+  peopleAttending: AttendingPeopleInterface[];
 };
 
 export const PeopleAttending: FC<Props> = ({ count, peopleAttending }) => {

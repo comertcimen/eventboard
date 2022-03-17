@@ -6,13 +6,52 @@ import {
   createStyles,
 } from "@mantine/core";
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { nameAvatarize, supabase } from "src/utils";
+import { nameAvatarize, supabase, user } from "src/utils";
+import { UserInterface } from "src/constants";
 
 export const User: FC = () => {
   const { classes, theme } = useStyles();
-  const user = supabase.auth.user();
+  type TempUserType = UserInterface | null;
+  const [userData, setUserData] = useState<TempUserType>(null);
+  const [profilePic, setProfilePic] = useState<string>("");
+
+  useEffect(() => {
+    if (user) {
+      setUserData({
+        id: user.id,
+        created_at: "",
+        updated_at: "",
+        username: user.user_metadata.username,
+        email: user.email || "",
+        name: user.user_metadata.name,
+        surname: user.user_metadata.surname,
+      });
+    }
+
+    const ac = new AbortController();
+
+    const getProfileData = async () => {
+      const { data } = await supabase
+        .from("users")
+        .select()
+        .eq("id", user?.id)
+        .limit(1)
+        .abortSignal(ac.signal)
+        .single();
+
+      setProfilePic(data.avatar_url);
+
+      if (!user) {
+        setUserData(data);
+      }
+    };
+
+    getProfileData();
+
+    return () => ac.abort();
+  }, []);
 
   return (
     <div
@@ -25,17 +64,17 @@ export const User: FC = () => {
         }`,
       }}
     >
-      <NavLink to={`/u/${user?.user_metadata.username}`}>
+      <NavLink to={`/u/${userData?.username}`}>
         <UnstyledButton className={classes.user}>
           <Group>
-            <Avatar radius="xl">
+            <Avatar radius="xl" src={profilePic}>
               {nameAvatarize(
-                `${user?.user_metadata.name} ${user?.user_metadata.surname}`
+                `${userData?.name || ""} ${userData?.surname || ""}`
               )}
             </Avatar>
             <div style={{ flex: 1 }}>
               <Text size="sm" weight={500}>
-                {`${user?.user_metadata.name} ${user?.user_metadata.surname}`}
+                {`${userData?.name || ""} ${userData?.surname || ""}`}
               </Text>
               <Text color="dimmed" size="xs">
                 {user?.email}
