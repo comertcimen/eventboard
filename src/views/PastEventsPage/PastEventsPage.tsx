@@ -24,7 +24,7 @@ interface DataType {
 }
 
 export const PastEvents = () => {
-  const [data, setData] = useState<DataType[] | null>(null);
+  const [data /*, setData*/] = useState<DataType[] | null>(null);
 
   /* useEffect(() => {
     const eventsRef = collection(db, "events");

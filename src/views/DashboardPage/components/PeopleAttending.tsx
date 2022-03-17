@@ -10,7 +10,7 @@ type Props = {
 
 export const PeopleAttending: FC<Props> = ({ count, peopleAttending }) => {
   const [tooltipOpened, setTooltipOpened] = useState<boolean>(false);
-  const [attendingNames, setAttendingNames] = useState<string[]>([]);
+  const [attendingNames /*, setAttendingNames*/] = useState<string[]>([]);
 
   const showTooltip = async () => {
     /* if (peopleAttending.length > 0) {

@@ -1,12 +1,9 @@
 import Chat, { Bubble, MessageProps, useMessages } from "@chatui/core";
 import "@chatui/core/dist/index.css";
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { hashCode, intToRGB, emailToUsername } from "src/utils";
+import { hashCode, intToRGB } from "src/utils";
 import { Text } from "@mantine/core";
-import { useSnackbar } from "notistack";
 
-interface DataType {
+/* interface DataType {
   _id?: string;
   content?: { text: string };
   createdAt?: any;
@@ -18,11 +15,10 @@ interface DataType {
     id?: string;
     name?: string;
   };
-}
+} */
 
 export const ChatPage = () => {
-  const { enqueueSnackbar } = useSnackbar();
-  const { messages, prependMsgs, appendMsg } = useMessages([]);
+  const { messages /*prependMsgs, appendMsg*/ } = useMessages([]);
 
   /* useEffect(() => {
     const getData = async () => {
