@@ -15,7 +15,7 @@ import { useMediaQuery, useForm } from "@mantine/hooks";
 import AddIcon from "@mui/icons-material/Add";
 import Logo from "src/assets/event.svg";
 import { DatePicker, TimeInput } from "@mantine/dates";
-import { supabase, user } from "src/utils";
+import { supabase } from "src/utils";
 import { useSnackbar } from "notistack";
 import { useDispatch } from "react-redux";
 import { TRIGGEREVENTS } from "src/store/actions";
@@ -24,6 +24,7 @@ export const HeaderItems: FC = () => {
   const matches = useMediaQuery("(min-width: 500px)");
   const [loading, setLoading] = useState<boolean>(false);
   const [opened, setOpened] = useState<boolean>(false);
+  const user = supabase.auth.user();
   const dispatcher = useDispatch();
 
   const { enqueueSnackbar } = useSnackbar();

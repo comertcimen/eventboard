@@ -8,7 +8,7 @@ import {
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
 import { FC, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { nameAvatarize, supabase, user } from "src/utils";
+import { nameAvatarize, supabase } from "src/utils";
 import { UserInterface } from "src/constants";
 
 export const User: FC = () => {
@@ -16,6 +16,8 @@ export const User: FC = () => {
   type TempUserType = UserInterface | null;
   const [userData, setUserData] = useState<TempUserType>(null);
   const [profilePic, setProfilePic] = useState<string>("");
+
+  const user = supabase.auth.user();
 
   useEffect(() => {
     if (user) {
@@ -51,7 +53,7 @@ export const User: FC = () => {
     getProfileData();
 
     return () => ac.abort();
-  }, []);
+  }, [user]);
 
   return (
     <div

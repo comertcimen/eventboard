@@ -14,7 +14,7 @@ export const RequireAuth = () => {
     });
 
     return data?.unsubscribe;
-  }, []);
+  }, [session]);
 
   if (!session) {
     return <Navigate to="/" />;

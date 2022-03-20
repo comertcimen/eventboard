@@ -9,5 +9,3 @@ export const supabase = createClient(
     persistSession: true,
   }
 );
-
-export const user = supabase.auth.user();

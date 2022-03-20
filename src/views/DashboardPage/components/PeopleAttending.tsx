@@ -6,40 +6,28 @@ import { AttendingPeopleInterface } from "src/constants";
 type Props = {
   count: number;
   peopleAttending: AttendingPeopleInterface[];
+  eventId: string;
 };
 
-export const PeopleAttending: FC<Props> = ({ count, peopleAttending }) => {
+export const PeopleAttending: FC<Props> = ({
+  count,
+  peopleAttending,
+  eventId,
+}) => {
   const [tooltipOpened, setTooltipOpened] = useState<boolean>(false);
   const [attendingNames /*, setAttendingNames*/] = useState<string[]>([]);
 
   const showTooltip = async () => {
-    /* if (peopleAttending.length > 0) {
-      const names: string[] = [];
+    /* if (count > 0) {
+      const { data, error } = await supabase
+        .from("people_attending")
+        .select("*, users!inner(*)");
 
-      const usersRef = collection(db, "users");
-
-      let promises: Promise<DocumentData>[] = [];
-
-      peopleAttending.forEach(async (item) => {
-        const q = query(usersRef, where("__name__", "==", item));
-        promises.push(getDocs(q));
-      });
-
-      Promise.all(promises)
-        .then((results) => {
-          results.forEach((result) => {
-            const userData = result.docs[0].data();
-            names.push(`${userData.name} ${userData.surname}`);
-          });
-        })
-        .then(() => {
-          setAttendingNames(names);
-          setTooltipOpened(true);
-        });
+      console.log(data);
     } */
   };
 
-  if (peopleAttending.length === 0) {
+  if (count === 0) {
     return <></>;
   }
 
@@ -63,7 +51,14 @@ export const PeopleAttending: FC<Props> = ({ count, peopleAttending }) => {
           spacing={7}
         >
           <ThumbUpIcon
-            sx={{ color: "#228be6", fontSize: "1.1rem", cursor: "pointer" }}
+            sx={{
+              background: "#228be6",
+              color: "#fff",
+              fontSize: "0.9rem",
+              borderRadius: "50%",
+              padding: "2px",
+              cursor: "pointer",
+            }}
           />
           <Text
             size="sm"

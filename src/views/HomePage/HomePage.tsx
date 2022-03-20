@@ -35,7 +35,7 @@ export const HomePage = () => {
     },
 
     validationRules: {
-      //email: (value) => new RegExp("^\\w+([-+.']w+)*@uos.de$").test(value),
+      email: (value) => new RegExp("^\\w+([-+.']w+)*@uos.de$").test(value),
       password: (value) => value !== "",
     },
 
@@ -55,7 +55,7 @@ export const HomePage = () => {
     },
 
     validationRules: {
-      //email: (value) => new RegExp("^\\w+([-+.']w+)*@uos.de$").test(value),
+      email: (value) => new RegExp("^\\w+([-+.']w+)*@uos.de$").test(value),
       password: (value) =>
         /^(?!.*\s)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]).{8,16}$/.test(
           value

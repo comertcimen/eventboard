@@ -4,28 +4,48 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ModeCommentOutlinedIcon from "@mui/icons-material/ModeCommentOutlined";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import { useMediaQuery } from "@mantine/hooks";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { AttendingPeopleInterface } from "src/constants";
-import { supabase, user } from "src/utils";
+import { supabase } from "src/utils";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   id: string;
   attendingPeople: AttendingPeopleInterface[];
+  ownerUsername: string;
 };
 
-export const EventActions: FC<Props> = ({ id, attendingPeople }) => {
+export const EventActions: FC<Props> = ({
+  id,
+  attendingPeople,
+  ownerUsername,
+}) => {
   const isSmall = useMediaQuery("(max-width: 500px)");
-
+  const user = supabase.auth.user();
   const filtered = attendingPeople.filter((item) => item.user_id === user?.id);
-  const amIAttending = filtered.length > 0;
+  const [amIAttending, setAmIAttending] = useState<boolean>(
+    filtered.length > 0
+  );
+  const navigate = useNavigate();
 
   const handleAttend = async () => {
     if (amIAttending) {
-      await supabase.from("people_attending").delete().match({ event_id: id });
+      const { error } = await supabase
+        .from("people_attending")
+        .delete()
+        .match({ event_id: id });
+
+      if (!error) {
+        setAmIAttending(false);
+      }
     } else {
-      await supabase
+      const { error } = await supabase
         .from("people_attending")
         .insert([{ user_id: user?.id, event_id: id }]);
+
+      if (!error) {
+        setAmIAttending(true);
+      }
     }
   };
   return (
@@ -60,6 +80,7 @@ export const EventActions: FC<Props> = ({ id, attendingPeople }) => {
         }}
         fullWidth
         leftIcon={<ModeCommentOutlinedIcon />}
+        onClick={() => navigate(`/u/${ownerUsername}/events/${id}`)}
       >
         Comment
       </Button>

@@ -70,6 +70,24 @@ export const CustomRoutes = () => {
             </AppWrapper>
           }
         />
+
+        <Route
+          path="/u/:id/events"
+          element={
+            <AppWrapper>
+              <div>User All Events</div>
+            </AppWrapper>
+          }
+        />
+
+        <Route
+          path="/u/:id/events/:event_id"
+          element={
+            <AppWrapper>
+              <div>User Single Event</div>
+            </AppWrapper>
+          }
+        />
       </Route>
 
       <Route path="*" element={<NotFound />} />
